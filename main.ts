@@ -128,6 +128,31 @@ interface Held {
   entrySeq: number;
 }
 
+/**
+ * The exit verdict for a held position on this bar's close. Returns the
+ * reason to sell the whole position, or null to keep holding it. The five
+ * reasons are checked in the order that matters most to the trade: the
+ * trailing stop first (it guards the run already banked), then the trend
+ * turning, then the profit and loss caps, then the clock.
+ */
+function exitReason(
+  trendGap: number,
+  trendPrevGap: number,
+  closeNum: number,
+  peak: number,
+  entrySeq: number,
+  seq: number,
+  value: bigint,
+  cost: bigint,
+): string | null {
+  if (((peak / closeNum - 1) * 10000) >= TRAIL_BPS) return 'trailing-stop';
+  if (trendGap < 0 && trendPrevGap >= 0) return 'trend-turned';
+  if (value * 10000n >= cost * BigInt(10000 + TAKE_PROFIT_BPS)) return 'take-profit';
+  if (value * 10000n <= cost * BigInt(10000 - STOP_LOSS_BPS)) return 'stop-loss';
+  if (seq - entrySeq >= MAX_HOLD_BARS) return 'time-stop';
+  return null;
+}
+
 const trends = new Map<string, Trend>();
 const held = new Map<string, Held>();
 
@@ -179,14 +204,19 @@ await runBars({
 
       if (pos !== undefined && h !== undefined) {
         // --- Exit: the whole position on the first reason that holds. ---
-        const value = state.value(symbol, pos.qty);
-        const cost = pos.cost;
-        const crossedDown = trend.gap < 0 && trend.prevGap >= 0;
-        const trailed = ((h.peak / closeNum - 1) * 10000) >= TRAIL_BPS;
-        const tookProfit = value * 10000n >= cost * BigInt(10000 + TAKE_PROFIT_BPS);
-        const stoppedOut = value * 10000n <= cost * BigInt(10000 - STOP_LOSS_BPS);
-        const timedOut = state.seq - h.entrySeq >= MAX_HOLD_BARS;
-        if (crossedDown || trailed || tookProfit || stoppedOut || timedOut) {
+        // The reason is level-based, so a sell the market refuses is sent
+        // again on the next bar while its reason still holds.
+        const reason = exitReason(
+          trend.gap,
+          trend.prevGap,
+          closeNum,
+          h.peak,
+          h.entrySeq,
+          state.seq,
+          state.value(symbol, pos.qty),
+          pos.cost,
+        );
+        if (reason !== null) {
           orders.push({ side: 'sell', symbol, qty: pos.qty, max_slippage_bps: MAX_SLIPPAGE_BPS });
         }
         continue;
