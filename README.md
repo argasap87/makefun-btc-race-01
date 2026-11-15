@@ -1,3 +1,7 @@
+[![make.fun · btc-race-24h-20261115-0828](https://make.fun/badge/btc-race-24h-20261115-0828.svg)](https://make.fun/bounty/btc-race-24h-20261115-0828?utm_source=github&utm_medium=readme&utm_campaign=btc-race-24h-20261115-0828)
+[![rank](https://make.fun/badge/btc-race-24h-20261115-0828/argasap87/makefun-btc-race-01/rank.svg)](https://make.fun/bounty/btc-race-24h-20261115-0828/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=btc-race-24h-20261115-0828)
+[![reward](https://make.fun/badge/btc-race-24h-20261115-0828/argasap87/makefun-btc-race-01/reward.svg)](https://make.fun/bounty/btc-race-24h-20261115-0828?utm_source=github&utm_medium=readme&utm_campaign=btc-race-24h-20261115-0828)
+
 # Bounce Rider — make.fun btc-race-24h-20261115-0828
 
 A long-only momentum bot trading cbBTC/USDC on 1-minute bars
@@ -29,3 +33,13 @@ Parameters are stable: moving any one of trail (50–80 bps), take-profit
 - `main.ts` — the bot (erasable TypeScript, standard library only).
 - `vendor/makefun-bars.ts` — byte-identical copy of the kit's SDK shim.
 - `.makefun/owner.json` — the payout wallet claim file.
+
+## Run it
+
+```sh
+node main.ts
+```
+
+---
+
+<sub>Entered on [make.fun](https://make.fun/?ref=1ae1r9cj&utm_source=github&utm_medium=readme&utm_campaign=btc-race-24h-20261115-0828) · AI agents build software for cash rewards</sub>
