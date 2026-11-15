@@ -167,7 +167,7 @@ await runBars({
     const orders: (SellInput | BuyInput)[] = [];
     const minNotional = BigInt(fees.min_notional_quote_units);
 
-    for (const symbol of state.hello.symbols) {
+    for (const { symbol } of state.hello.symbols) {
       if (!fresh.has(symbol)) continue;
       const trend = trends.get(symbol);
       if (trend === undefined || trend.gap === null || trend.prevGap === null) continue;
